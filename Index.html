@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Clock WIT</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        color: white;
+    }
+
+    .clock-container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 30px 25px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        width: 95%;
+        max-width: 400px;
+    }
+
+    .time {
+        font-size: 3.5rem;
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+
+    .date {
+        margin-top: 15px;
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+
+    .zone {
+        margin-top: 8px;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        opacity: 0.7;
+    }
+
+    /* Khusus layar sangat kecil */
+    @media (max-width: 400px) {
+        .time {
+            font-size: 3rem;
+        }
+
+        .date {
+            font-size: 1rem;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="clock-container">
+    <div class="time" id="time">00:00:00</div>
+    <div class="date" id="date">Memuat tanggal...</div>
+    <div class="zone">Waktu Indonesia Timur (WIT)</div>
+</div>
+
+<script>
+function updateClock() {
+    const optionsTime = {
+        timeZone: "Asia/Jayapura",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    };
+
+    const optionsDate = {
+        timeZone: "Asia/Jayapura",
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    };
+
+    const timeFormatter = new Intl.DateTimeFormat("id-ID", optionsTime);
+    const dateFormatter = new Intl.DateTimeFormat("id-ID", optionsDate);
+
+    document.getElementById("time").textContent =
+        timeFormatter.format(new Date());
+
+    document.getElementById("date").textContent =
+        dateFormatter.format(new Date());
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+
+</body>
+</html>
