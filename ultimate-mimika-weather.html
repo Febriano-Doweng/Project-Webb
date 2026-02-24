@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Clock & Weather Mimika</title>
+
+<style>
+:root {
+  --bg:#0e1321;
+  --card:rgba(255,255,255,0.08);
+  --text:#fff;
+}
+.light {
+  --bg:#f4f4f4;
+  --card:#ffffff;
+  --text:#111;
+}
+
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',sans-serif;
+  overflow:hidden;
+  transition:0.4s;
+}
+
+/* ANIMASI AWAN */
+.cloud{
+  position:absolute;
+  top:20%;
+  width:200px;
+  opacity:0.2;
+  animation:moveCloud 60s linear infinite;
+}
+
+.cloud:nth-child(2){
+  top:40%;
+  animation-duration:90s;
+}
+
+@keyframes moveCloud{
+  from{ left:-250px; }
+  to{ left:110%; }
+}
+.container{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  background:var(--card);
+  padding:30px 40px;
+  border-radius:20px;
+  backdrop-filter:blur(15px);
+  box-shadow:0 8px 30px rgba(0,0,0,0.4);
+}
+
+.time{
+  font-size:3.2rem;
+  font-weight:bold;
+}
+.date{
+  margin-top:8px;
+  font-size:1.1rem;
+}
+
+.weather{
+  margin-top:20px;
+  font-size:1.1rem;
+}
+
+button{
+  margin-top:15px;
+  padding:8px 16px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+}
+@media(max-width:480px){
+  .time{font-size:2.5rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- AWAN SVG -->
+<svg class="cloud" viewBox="0 0 512 512">
+<path fill="white" d="M400 224a96 96 0 00-188-32 80 80 0 00-36 152h220a72 72 0 004-144z"/>
+</svg>
+
+<svg class="cloud" viewBox="0 0 512 512">
+<path fill="white" d="M400 224a96 96 0 00-188-32 80 80 0 00-36 152h220a72 72 0 004-144z"/>
+</svg>
+
+<div class="container">
+  <div class="time" id="time"></div>
+  <div class="date" id="date"></div>
+  <div class="weather" id="weather">Memuat cuaca BMKG...</div>
+  <button onclick="toggleMode()">Dark / Light</button>
+</div>
+
+<audio id="rainSound">
+  <source src="https://www.soundjay.com/nature/rain-01.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// ===== JAM WIT =====
+function updateClock(){
+  const now=new Date();
+  const time=new Intl.DateTimeFormat("id-ID",{
+    timeZone:"Asia/Jayapura",
+    hour:"2-digit",minute:"2-digit",second:"2-digit",
+    hour12:false
+  }).format(now);
+
+  const date=new Intl.DateTimeFormat("id-ID",{
+    timeZone:"Asia/Jayapura",
+    weekday:"long",day:"numeric",month:"long",year:"numeric"
+  }).format(now);
+
+  document.getElementById("time").textContent=time;
+  document.getElementById("date").textContent=date+" WIT";
+}
+
+// ===== BMKG API =====
+// BMKG menyediakan data publik JSON/XML
+// Endpoint contoh gempa & cuaca wilayah Indonesia
+
+async function updateWeather(){
+  try{
+    // API prakiraan cuaca BMKG wilayah Papua (kode 97000+)
+    const response = await fetch("https://www.bmkg.go.id/cuaca/prakiraan-cuaca/94.04.01.1003"); 
+    const data = await response.json();
+
+    // Ambil data pertama prakiraan
+    const cuaca = data.data[0].cuaca[0][0];
+    const kondisi = cuaca.weather_desc;
+    const suhu = cuaca.t;
+
+    document.getElementById("weather").textContent =
+      `${suhu}°C • ${kondisi}`;
+      
+      // Jika hujan → mainkan suara
+    if(kondisi.toLowerCase().includes("hujan")){
+      document.getElementById("rainSound").play();
+    }
+
+  }catch(err){
+    document.getElementById("weather").textContent =
+      "Cuaca BMKG tidak tersedia";
+  }
+}
+
+// ===== MODE =====
+function toggleMode(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("mode",
+    document.body.classList.contains("light")?"light":"dark");
+}
+if(localStorage.getItem("mode")==="light"){
+  document.body.classList.add("light");
+}
+
+// ===== AUTO RUN =====
+updateClock();
+updateWeather();
+setInterval(updateClock,1000);
+setInterval(updateWeather,600000); // refresh 10 menit
+</script>
+
+</body>
+</html>
