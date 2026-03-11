@@ -168,7 +168,7 @@ function openLightbox(type,src){
 
     ? `<img src="${src}">`
 
-    : `<video src="${src}" controls autoplay playsinline></video>`;
+    : `<video src="${src}" controls autoplay playsinline loop></video>`;
 
     lightbox.classList.add('show');
 
@@ -242,4 +242,5 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
 
 });
+
 
